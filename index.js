@@ -24,7 +24,8 @@ connectToDatabase();
 // Enable CORS
 app.use(cors({
   origin: ["http://localhost:3000",
-    "https://diary-app-frontend-lime.vercel.app"
+    "https://diary-app-frontend-lime.vercel.app",
+    "https://diary-app-frontend-fi2l.vercel.app"
   ],
 
   credentials: true // this allows cookies to be sent
