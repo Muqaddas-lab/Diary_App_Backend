@@ -5,6 +5,7 @@ import express from "express";
 import {
   createDiary,
   getUserDiaries,
+  getSingleDiary,
   updateDiaryEntry,
   deleteDiaryEntry,
 } from "../controllers/diaryController.js";
@@ -17,6 +18,7 @@ const router = express.Router();
 
 router.post("/", protect, createDiary);
 router.get("/", protect, getUserDiaries); 
+router.get("/:id", protect, getSingleDiary);
 router.put("/:id", protect, updateDiaryEntry);
 router.delete("/:id", protect, deleteDiaryEntry);
 

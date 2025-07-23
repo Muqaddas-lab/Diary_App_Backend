@@ -16,9 +16,20 @@ const diarySchema = new mongoose.Schema({
     required: true,
   },
 
-  // Optional image URL or path associated with the diary entry
-  image: {
+  // // // Optional image URL or path associated with the diary entry
+  // image: {
+  //   type: String,
+  // },
+
+  mood: {
     type: String,
+    enum: ["happy", "sad", "neutral", "angry", "excited", "anxious"], // predefined moods
+    default: "neutral", // default mood if not specified
+  },
+  // Date of the diary entry - defaults to current date
+  date: {
+    type: Date,
+    default: Date.now,    
   },
 
   // Reference to the user who created the diary entry

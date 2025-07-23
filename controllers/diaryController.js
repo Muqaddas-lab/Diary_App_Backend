@@ -1,9 +1,35 @@
 import Diary from "../models/Diary.js";
 
+//getsingle diary entry
+export const getSingleDiary = async (req, res) => {
+  try {
+    console.log("hello");
+    console.log("Fetching diary entry for ID:", req.params.id);
+    console.log("User ID from token:", req.user.id);
+    const diary = await Diary.findOne({
+      _id: req.params.id,
+      user: req.user.id, // 👈 only allow if diary belongs to this user
+    });
+
+    console.log("Diary entry found:", diary);
+
+    if (!diary) {
+      return res.status(404).json({ message: "Diary entry not found or unauthorized" });
+    }
+
+    res.status(200).json(diary);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching diary", error: error.message });
+  }
+};
+
+
+
 // Create diary controller
 export const createDiary = async (req, res) => {
   // Destructure frontend se aayi values
-  const { title, content, image } = req.body;
+  // const { title, content, image,mood,date } = req.body;
+  const { title, content, image,mood,date } = req.body;
   const imagePath = req.file ? req.file.path : null; // Agar image upload hui hai to uska path lo
 
   try {
@@ -11,7 +37,9 @@ export const createDiary = async (req, res) => {
     const diary = await Diary.create({
       title,
       content,
-      image,
+      // image,
+      mood,
+      date,
       user: req.user.id,
     });
 
@@ -43,12 +71,14 @@ export const getUserDiaries = async (req, res) => {
 // Update diary entry
 export const updateDiaryEntry = async (req, res) => {
   try {
-    const { title, content, image } = req.body;
+    // const { title, content, image, mood,date } = req.body;
+    const { title, content, mood,date } = req.body;
 
     // Find and update diary only if it belongs to the logged-in user
     const updatedDiary = await Diary.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id }, // Match ID and user
-      { title, content, image },
+      // { title, content, image,mood,date }, // Update fields
+      { title, content, mood,date }, // Update fields
       { new: true, runValidators: true }
     );
 
