@@ -1,35 +1,50 @@
-// Import JWT library for token verification
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
+// export const protect = (req, res, next) => {
+//   const token = req.headers.authorization?.split(" ")[1];
+//   if (!token) {
+//     return res.status(401).json({ message: "Unauthorized access" });
+//   }
+//   console.log("Token received:", token);
 
-// Middleware to protect routes - checks for valid JWT token
-export const protect = (req, res, next) => {
-  // Extract token from the "Authorization" header
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     console.log("Decoded token:", decoded);
+//     req.user = decoded;
+//     next();
+
+//   } catch (error) {
+//     console.error("Authentication error:", error);
+//     return res.status(403).json({ message: "Invalid or expired token" });
+//   }
+// };
+
+
+
+
+import jwt from "jsonwebtoken";
+import User from "../models/User.js"; // 👈 Make sure this path is correct
+
+export const protect = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
 
-  // If no token is provided, deny access
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized access" });
+    return res.status(401).json({ message: "Unauthorized access: Token missing" });
   }
 
-  // Log the received token (for debugging - optional)
-  console.log("Token received:", token);
-
   try {
-    // Verify the token using the JWT secret
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded Token:", decoded);
 
-    // Log the decoded payload (for debugging - optional)
-    console.log("Decoded token:", decoded);
+    const user = await User.findById(decoded.id).select("-password"); // fetch full user
 
-    // Attach user data to request object for further use in routes
-    req.user = decoded;
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized: User not found" });
+    }
 
-    // Proceed to the next middleware/route
+    req.user = user; // 👈 Safe: Now req.user.id is guaranteed
     next();
-
   } catch (error) {
-    // If token is invalid or expired, deny access
-    console.error("Authentication error:", error);
+    console.error("JWT Error:", error);
     return res.status(403).json({ message: "Invalid or expired token" });
   }
 };
